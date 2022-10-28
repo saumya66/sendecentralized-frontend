@@ -28,14 +28,18 @@ export default function SendContract() {
         const signer = web3Provider.getSigner()
         const contract = new ethers.Contract(address, abi, signer)
 
+        contract.once("RequestFulfilled", async () => {
+            console.log("RequestFulfilled")
+            let code = await contract.getRandomNum()
+            setGeneratedCode(code)
+            handleNewNotification()
+            setIsLoading(false)
+        })
+
         const transaction = await contract.uploadedFile(ipfsFileHash, {
             gasLimit: 2500000,
         })
-        await transaction.wait()
-        await handleSuccess(transaction)
-        let code = await contract.getRandomNum()
-        setGeneratedCode(code)
-        setIsLoading(false)
+        await transaction.wait(1)
     }
     const retrieve = async function () {
         setIsLoading(true)
@@ -50,15 +54,13 @@ export default function SendContract() {
             gasLimit: 2500000,
         })
         console.log("T : ", transaction)
+        let transactionReceipt
         try {
-            const transactionReceipt = await transaction.wait(1)
+            transactionReceipt = await transaction.wait(1)
         } catch (err) {
             console.log("F : ", err)
         }
-        // await transaction.wait(1).then((finalTx) => {
-        //     // console.log("File Hash : ", finalTx.events[0].args.fileHash)
-        //     // setFileHash(finalTx.events[0].args.fileHash)
-        // })
+        setFileHash(transactionReceipt.events[0].args.fileHash)
         setIsLoading(false)
     }
     // const {
@@ -106,7 +108,6 @@ export default function SendContract() {
 
     const handleSuccess = async (tx) => {
         try {
-            await tx.wait(1)
             handleNewNotification(tx)
         } catch (error) {
             console.log(error)
