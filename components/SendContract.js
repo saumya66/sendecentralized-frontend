@@ -3,6 +3,8 @@ import { contractAddresses, abi } from "../constants"
 import { useMoralis, useWeb3Contract } from "react-moralis"
 import { useEffect, useState } from "react"
 import { Input, useNotification } from "web3uikit"
+import ipfs from "../ipfs"
+import axios from "axios"
 // import { ethers } from "ethers"
 
 export default function SendContract() {
@@ -15,10 +17,14 @@ export default function SendContract() {
 
     const [ipfsFileHash, setIpfsFileHash] = useState()
     const [generatedCode, setGeneratedCode] = useState()
+    const [fileBuffer, setFileBuffer] = useState()
 
     const [code, setCode] = useState()
     const [fileHash, setFileHash] = useState()
     const [isLoading, setIsLoading] = useState(false)
+
+    const [fileImg, setFileImg] = useState(null)
+
     const send = async function () {
         setIsLoading(true)
         const address = sendContractAddress
@@ -114,12 +120,73 @@ export default function SendContract() {
         }
     }
 
+    // function captureFile(event) {
+    //     event.preventDefault()
+    //     const file = event.target.files[0]
+    //     const reader = new window.FileReader()
+    //     reader.readAsArrayBuffer(file)
+    //     reader.onloadend = () => {
+    //         setFileBuffer(Buffer(reader.result))
+    //         console.log("buffer", fileBuffer)
+    //     }
+    // }
+
+    // function onSubmit(event) {
+    //     event.preventDefault()
+    //     ipfs.files.add(fileBuffer, (error, result) => {
+    //         if (error) {
+    //             console.error(error)
+    //             return
+    //         }
+    //         setIpfsFileHash(result[0].hash)
+    //         console.log("ifpsHash", setIpfsFileHash)
+    //     })
+    // }
+    const sendFileToIPFS = async (e) => {
+        e.preventDefault()
+        console.log(fileImg)
+        console.log(process.env.PINATA_API_KEY)
+        if (fileImg) {
+            try {
+                const formData = new FormData()
+                formData.append("file", fileImg)
+
+                const resFile = await axios({
+                    method: "post",
+                    url: "https://api.pinata.cloud/pinning/pinFileToIPFS",
+                    data: formData,
+                    headers: {
+                        pinata_api_key: `${process.env.PINATA_API_KEY}`,
+                        pinata_secret_api_key: `${process.env.PINATA_API_SECRET}`,
+                        "Content-Type": "multipart/form-data",
+                    },
+                })
+                const ImgHash = `ipfs://${resFile.data.IpfsHash}`
+                setIpfsFileHash(ImgHash)
+                //Take a look at your Pinata Pinned section, you will see a new file added to you list.
+            } catch (error) {
+                console.log("Error sending File to IPFS: ")
+                console.log(error)
+            }
+        }
+    }
     return (
         <div className="p-5">
             <h1 className="py-4 px-4 font-bold text-3xl">Send</h1>
             {sendContractAddress ? (
                 <>
                     <div className="m-4">
+                        {ipfsFileHash && (
+                            <>
+                                <p>This image is stored on IPFS & The Ethereum Blockchain!</p>
+                                <img src={`https://ipfs.io/ipfs/${ipfsFileHash}`} alt="" />
+                            </>
+                        )}
+                        <h2>Upload</h2>
+                        <form onSubmit={sendFileToIPFS}>
+                            <input type="file" onChange={(e) => setFileImg(e.target.files[0])} />
+                            <button type="submit">Go</button>
+                        </form>
                         <Input
                             label="Label text"
                             name="Test text Input"
