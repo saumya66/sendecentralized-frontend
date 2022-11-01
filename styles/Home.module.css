@@ -30,6 +30,12 @@
   color : #1E0A42;
   font-weight: bold;
 }
+
+.h3{
+  font-size: 1rem;
+  color : #1E0A42;
+  font-weight: bold;
+}
 .header{
   display: flex;
   flex-direction: row;

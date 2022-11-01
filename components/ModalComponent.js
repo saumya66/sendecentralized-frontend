@@ -1,26 +1,27 @@
-const { Input, Modal } = require("web3uikit")
+import {
+    Box,
+    Button,
+    Modal,
+    ModalBody,
+    ModalCloseButton,
+    ModalContent,
+    ModalFooter,
+    ModalHeader,
+    ModalOverlay,
+} from "@chakra-ui/react"
 import styles from "../styles/Home.module.css"
 
-const ModalComponent = (isVisible) => {
+const ModalComponent = ({ isOpen, onClose, content }) => {
     return (
-        <Modal
-            isCentered
-            hasCancel={false}
-            hasFooter={false}
-            isVisible
-            width="50rem"
-            onCloseButtonPressed={function noRefCheck() {}}
-        >
-            <div
-                style={{
-                    padding: "20px",
-                    backgroundColor: "yellow",
-                }}
-            >
-                <div className={styles.h2}>
-                    To use the app please change the chain to one of the following 👇
-                </div>
-            </div>
+        <Modal closeOnOverlayClick={false} isOpen={isOpen} onClose={onClose} color={"white"}>
+            <ModalOverlay />
+            <ModalContent>
+                <ModalHeader>
+                    <div className={styles.h2}>Switch Chains</div>
+                </ModalHeader>
+                <ModalCloseButton />
+                <ModalBody>{content}</ModalBody>
+            </ModalContent>
         </Modal>
     )
 }
