@@ -74,28 +74,6 @@ export default function SendContract() {
         },
     }
 
-    const send = async function () {
-        setIsGettingCode(true)
-        const address = sendContractAddress
-        console.log(address)
-        const ethers = Moralis.web3Library
-        const web3Provider = await Moralis.enableWeb3()
-        const signer = web3Provider.getSigner()
-        const contract = new ethers.Contract(address, abi, signer)
-
-        contract.once("RequestFulfilled", async () => {
-            console.log("RequestFulfilled")
-            let code = await contract.getRandomNum()
-            setGeneratedCode(code)
-            handleNewNotification()
-            setIsGettingCode(false)
-        })
-
-        const transaction = await contract.uploadedFile(ipfsFileHash, {
-            gasLimit: 2500000,
-        })
-        await transaction.wait(1)
-    }
     const retrieve = async function () {
         setIsLoading(true)
         const address = sendContractAddress
@@ -151,11 +129,11 @@ export default function SendContract() {
     //     params: {},
     // })
 
-    const handleNewNotification = () => {
+    const handleNewNotification = (message) => {
         dispatch({
             type: "info",
-            message: "Transaction Complete!",
-            title: "Transaction Notification",
+            message: message,
+            title: "Transaction Complete!",
             position: "topR",
             icon: "bell",
         })
@@ -180,9 +158,6 @@ export default function SendContract() {
                     },
                 })
                 setIpfsFileHash(resFile.data.IpfsHash)
-                console.log(ipfsFileHash)
-                // await send()
-                //Take a look at your Pinata Pinned section, you will see a new file added to you list.
             } catch (error) {
                 console.log("Error sending File to IPFS: ")
                 console.log(error)
@@ -191,6 +166,34 @@ export default function SendContract() {
             }
         }
     }
+    useEffect(() => {
+        // console.log(ipfsFileHash)
+        const send = async function () {
+            setIsGettingCode(true)
+            const address = sendContractAddress
+            console.log(address)
+            const ethers = Moralis.web3Library
+            const web3Provider = await Moralis.enableWeb3()
+            const signer = web3Provider.getSigner()
+            const contract = new ethers.Contract(address, abi, signer)
+
+            contract.once("RequestFulfilled", async () => {
+                console.log("RequestFulfilled")
+                let code = await contract.getRandomNum()
+                setGeneratedCode(code)
+                handleNewNotification("Generated Code")
+                setIsGettingCode(false)
+            })
+
+            const transaction = await contract.uploadedFile(ipfsFileHash, {
+                gasLimit: 2500000,
+            })
+            handleNewNotification("Transaction Complete, generating code... ")
+            await transaction.wait(1)
+        }
+        ipfsFileHash && send()
+    }, [ipfsFileHash])
+
     return (
         <div className="p-5">
             {sendContractAddress ? (
@@ -266,7 +269,7 @@ export default function SendContract() {
                             </div>
                         </form>
                     </div>
-                    <div className="m-4">
+                    {/* <div className="m-4">
                         <Input
                             label="Label text"
                             name="Test text Input"
@@ -284,7 +287,7 @@ export default function SendContract() {
                             )}
                         </button>
                         <div>{`The file hash is : ${fileHash}`}</div>
-                    </div>
+                    </div> */}
                 </>
             ) : (
                 <div>Please connect to a supported chain </div>

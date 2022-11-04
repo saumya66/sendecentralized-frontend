@@ -1,9 +1,9 @@
 
 .uploadFilesContainer {
 	background-color: #f7fff7;
-    height: 460px;
-	width: 420px;
-	padding: 30px 60px;
+    height: 440px;
+	width: 100%;
+	/* padding: 10px 60px; */
 	border-radius: 40px;
 	display: flex;
    	align-items: center;
@@ -17,7 +17,7 @@
 	margin: 10px 0 15px;
 	padding: 30px 30px;
     height: 300px;
-	width: 350px;
+	width:80%;
 	text-align: center;
 }
 .dragFileInput{
