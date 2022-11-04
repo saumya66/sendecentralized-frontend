@@ -1,10 +1,21 @@
-.container {
+.siteContainer {
   padding: 1rem;
   width: 100vw;
   height: 100vh;
   background-color: #1E0A42;
 }
 
+.siteContentContainer{
+ display : flex;
+ flex-direction: row;
+  width: 100%;
+}
+.description{
+  width : 68%;
+}
+.app{
+  width : 30%;
+}
 .main {
   min-height: 100vh;
   padding: 4rem 0;

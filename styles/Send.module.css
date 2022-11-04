@@ -1,0 +1,104 @@
+
+.uploadFilesContainer {
+	background-color: #f7fff7;
+    height: 460px;
+	width: 420px;
+	padding: 30px 60px;
+	border-radius: 40px;
+	display: flex;
+   	align-items: center;
+   	justify-content: center;
+	flex-direction: column;
+	box-shadow: rgba(0, 0, 0, 0.24) 0px 10px 20px, rgba(0, 0, 0, 0.28) 0px 6px 6px;
+}
+.dragFileArea {
+	border: 2px dashed #7b2cbf;
+	border-radius: 40px;
+	margin: 10px 0 15px;
+	padding: 30px 30px;
+    height: 300px;
+	width: 350px;
+	text-align: center;
+}
+.dragFileInput{
+    height: 300px;
+	width: 350px;
+    background-color: black;
+}
+ 
+ 
+ 
+/* .dragFileArea label .browseFilesText {
+	color: #7b2cbf;
+	font-weight: bolder;
+	cursor: pointer;
+} */
+.browseFilesText{
+    color: #7b2cbf;
+	font-weight: bolder;
+	cursor: pointer;
+}
+.browseFiles span {
+	position: relative;
+	top: -25px;
+}
+.defaultFileInput {
+	opacity: 0;
+}
+.cannotUploadMessage {
+	background-color: #ffc6c4;
+	font-size: 17px;
+	display: flex;
+	align-items: center;
+	margin: 5px 0;
+	padding: 5px 10px 5px 30px;
+	border-radius: 5px;
+	color: #BB0000;
+	display: none;
+}
+@keyframes fadeIn {
+  0% {opacity: 0;}
+  100% {opacity: 1;}
+}
+ 
+.fileBlock {
+    display:flex;
+	color: #f7fff7;
+	background-color: #6B46C1;
+  	transition: all 1s;
+    width:100%;
+    height : 36px;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	/* margin: 10px 0 15px;
+	padding: 10px 10px; */
+	border-radius: 25px;
+}
+ 
+.removeFileIcon {
+	cursor: pointer;
+}
+.progressBar {
+	display: flex;
+	position: absolute;
+	bottom: 0;
+	left: 4.5%;
+	width: 0;
+	height: 5px;
+	border-radius: 25px;
+	background-color: #4BB543;
+}
+.uploadButton {
+	font-family: 'Montserrat';
+	background-color: #7b2cbf;
+	color: #f7fff7;
+	display: flex;
+	align-items: center;
+	font-size: 18px;
+	border: none;
+	border-radius: 20px;
+	margin: 10px;
+	padding: 7.5px 50px;
+	cursor: pointer;
+}

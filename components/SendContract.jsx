@@ -1,11 +1,15 @@
 import { contractAddresses, abi } from "../constants"
 // dont export from moralis when using react
 import { useMoralis, useWeb3Contract } from "react-moralis"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { Input, useNotification } from "web3uikit"
-import ipfs from "../ipfs"
 import axios from "axios"
-// import { ethers } from "ethers"
+import styles from "../styles/Send.module.css"
+import Lottie from "react-lottie"
+import uploadedAnimationData from "../assets/uploaded-animation.json"
+import uploadAnimationData from "../assets/upload-animation.json"
+import { Button, BeatLoader } from "@chakra-ui/react"
+import { useDropzone } from "react-dropzone"
 
 export default function SendContract() {
     const { Moralis, isWeb3Enabled, chainId: chainIdHex } = useMoralis()
@@ -14,6 +18,29 @@ export default function SendContract() {
     // console.log(`ChainId is ${chainId}`)
     const sendContractAddress = chainId in contractAddresses ? contractAddresses[chainId] : null
     const dispatch = useNotification()
+
+    const onDrop = useCallback((acceptedFiles) => {
+        console.log(acceptedFiles)
+        setFileImg(acceptedFiles[0])
+    }, [])
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
+    // draggableFileArea.addEventListener("drop", (e) => {
+    //     console.log("File Dropped Successfully!")
+    //     setFileImg(
+    //         e.target.files[0].name + " " + (e.target.files[0].size / 1024).toFixed(1) + " KB"
+    //     )
+    //     console.log(
+    //         e.target.files[0].name + " " + (e.target.files[0].size / 1024).toFixed(1) + " KB"
+    //     )
+    //     // let files = e.dataTransfer.files;
+    //     // fileInput.files = files;
+    //     console.log(document.querySelector(".default-file-input").value)
+    //     // fileName.innerHTML = files[0].name;
+    //     // fileSize.innerHTML = (files[0].size/1024).toFixed(1) + " KB";
+    //     // uploadedFile.style.cssText = "display: flex;";
+    //     // progressBar.style.width = 0;
+    //     // fileFlag = 0;
+    // })
 
     const [ipfsFileHash, setIpfsFileHash] = useState()
     const [generatedCode, setGeneratedCode] = useState()
@@ -25,8 +52,30 @@ export default function SendContract() {
 
     const [fileImg, setFileImg] = useState(null)
 
+    const [isUploading, setIsUploading] = useState(false)
+    const [isGettingCode, setIsGettingCode] = useState(false)
+    const [isGettingFile, setIsGettingFile] = useState(false)
+
+    const uploadAnimationdefaultOptions = {
+        loop: true,
+        autoplay: true,
+        animationData: uploadAnimationData,
+        rendererSettings: {
+            preserveAspectRatio: "xMidYMid slice",
+        },
+    }
+
+    const uploadedAnimationdefaultOptions = {
+        loop: false,
+        autoplay: true,
+        animationData: uploadedAnimationData,
+        rendererSettings: {
+            preserveAspectRatio: "xMidYMid slice",
+        },
+    }
+
     const send = async function () {
-        setIsLoading(true)
+        setIsGettingCode(true)
         const address = sendContractAddress
         console.log(address)
         const ethers = Moralis.web3Library
@@ -39,7 +88,7 @@ export default function SendContract() {
             let code = await contract.getRandomNum()
             setGeneratedCode(code)
             handleNewNotification()
-            setIsLoading(false)
+            setIsGettingCode(false)
         })
 
         const transaction = await contract.uploadedFile(ipfsFileHash, {
@@ -112,45 +161,14 @@ export default function SendContract() {
         })
     }
 
-    const handleSuccess = async (tx) => {
-        try {
-            handleNewNotification(tx)
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
-    // function captureFile(event) {
-    //     event.preventDefault()
-    //     const file = event.target.files[0]
-    //     const reader = new window.FileReader()
-    //     reader.readAsArrayBuffer(file)
-    //     reader.onloadend = () => {
-    //         setFileBuffer(Buffer(reader.result))
-    //         console.log("buffer", fileBuffer)
-    //     }
-    // }
-
-    // function onSubmit(event) {
-    //     event.preventDefault()
-    //     ipfs.files.add(fileBuffer, (error, result) => {
-    //         if (error) {
-    //             console.error(error)
-    //             return
-    //         }
-    //         setIpfsFileHash(result[0].hash)
-    //         console.log("ifpsHash", setIpfsFileHash)
-    //     })
-    // }
     const sendFileToIPFS = async (e) => {
         e.preventDefault()
+        setIsUploading(true)
         console.log(fileImg)
-        console.log(process.env.PINATA_API_KEY)
         if (fileImg) {
             try {
                 const formData = new FormData()
                 formData.append("file", fileImg)
-
                 const resFile = await axios({
                     method: "post",
                     url: "https://api.pinata.cloud/pinning/pinFileToIPFS",
@@ -161,60 +179,92 @@ export default function SendContract() {
                         "Content-Type": "multipart/form-data",
                     },
                 })
-                const ImgHash = `ipfs://${resFile.data.IpfsHash}`
-                setIpfsFileHash(ImgHash)
+                setIpfsFileHash(resFile.data.IpfsHash)
+                console.log(ipfsFileHash)
+                // await send()
                 //Take a look at your Pinata Pinned section, you will see a new file added to you list.
             } catch (error) {
                 console.log("Error sending File to IPFS: ")
                 console.log(error)
+            } finally {
+                setIsUploading(false)
             }
         }
     }
     return (
         <div className="p-5">
-            <h1 className="py-4 px-4 font-bold text-3xl">Send</h1>
             {sendContractAddress ? (
                 <>
                     <div className="m-4">
-                        {ipfsFileHash && (
+                        {/* {ipfsFileHash && (
                             <>
                                 <p>This image is stored on IPFS & The Ethereum Blockchain!</p>
                                 <img src={`https://ipfs.io/ipfs/${ipfsFileHash}`} alt="" />
                             </>
-                        )}
+                        )} */}
                         <h2>Upload</h2>
-                        <form onSubmit={sendFileToIPFS}>
-                            <input type="file" onChange={(e) => setFileImg(e.target.files[0])} />
-                            <button type="submit">Go</button>
+                        <form encType="multipart/form-data">
+                            <div className={styles.uploadFilesContainer}>
+                                {fileImg ? (
+                                    <div className={styles.dragFileArea}>
+                                        <Lottie
+                                            options={uploadedAnimationdefaultOptions}
+                                            height={200}
+                                            width={200}
+                                        />
+                                        <div className={styles.fileBlock}>
+                                            <p className={styles.fileName}>
+                                                {`${fileImg.name} | ${(
+                                                    fileImg.size / 1024
+                                                ).toFixed(1)}KB`}
+                                            </p>{" "}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className={styles.dragFileArea} {...getRootProps()}>
+                                        <input type="file" {...getInputProps()} />{" "}
+                                        <Lottie
+                                            options={uploadAnimationdefaultOptions}
+                                            height={200}
+                                            width={200}
+                                        />
+                                        <p style={{ fontSize: "1rem" }}>
+                                            {" "}
+                                            Drag & drop any file here or{" "}
+                                            <span className={styles.browseFilesText}>
+                                                browse
+                                            </span>{" "}
+                                            file from device
+                                        </p>
+                                        {/* <label className={styles.label}>
+                                            <span className={styles.browseFiles}>
+                                              
+                                            </span>{" "}
+                                        </label> */}
+                                    </div>
+                                )}
+
+                                {fileImg ? (
+                                    <Button
+                                        onClick={sendFileToIPFS}
+                                        type="submit"
+                                        colorScheme="purple"
+                                        isLoading={isGettingCode}
+                                    >
+                                        {generatedCode ? generatedCode : "Send"}
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        onClick={sendFileToIPFS}
+                                        colorScheme="purple"
+                                        isLoading={isUploading}
+                                        isDisabled={fileImg ? false : true}
+                                    >
+                                        Upload
+                                    </Button>
+                                )}
+                            </div>
                         </form>
-                        <Input
-                            label="Label text"
-                            name="Test text Input"
-                            onChange={(e) => setIpfsFileHash(e.target.value)}
-                        />
-                        <button
-                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                            onClick={send}
-                            // onClick={async () => {
-                            //     console.log(ipfsFileHash)
-                            //     await uploadedFile({
-                            //         // onComplete:
-                            //         // onError:
-                            //         onSuccess: handleSuccess,
-                            //         onError: (error) => console.log(error),
-                            //     })
-                            //     let code = await getRandomNum()
-                            //     setGeneratedCode(code)
-                            // }}
-                            disabled={isLoading}
-                        >
-                            {isLoading ? (
-                                <div className="animate-spin spinner-border h-8 w-8 border-b-2 rounded-full"></div>
-                            ) : (
-                                "Send File"
-                            )}
-                        </button>
-                        <div>{`The generated Code is : ${generatedCode}`}</div>
                     </div>
                     <div className="m-4">
                         <Input
@@ -225,27 +275,6 @@ export default function SendContract() {
                         <button
                             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                             onClick={retrieve}
-                            // onClick={async () => {
-                            //     console.log(code)
-                            //     let txResponse = await getFile({
-                            //         // onComplete:
-                            //         // onError:
-                            //         onSuccess: (tx) =>
-                            //             tx.wait().then((finalTx) => {
-                            //                 console.log(
-                            //                     "File Hash : ",
-                            //                     finalTx.events[0].args.fileHash
-                            //                 )
-                            //             }),
-                            //         onError: (error) => console.log(error),
-                            //     })
-                            //     console.log("a")
-
-                            //     // let fileHash = txReceipt.events[0].args.fileHash
-                            //     // console.log("File Hash : ", fileHash)
-                            //     // console.log(fileHash.data?.toString())
-                            //     // setFileHash(fileHash)
-                            // }}
                             disabled={isLoading}
                         >
                             {isLoading ? (
