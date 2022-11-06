@@ -1,23 +1,59 @@
 
-.uploadFilesContainer {
-	background-color: #f7fff7;
-    height: 440px;
+.card {
+	/* position: relative; */
+	height: 440px;
 	width: 100%;
-	/* padding: 10px 60px; */
+	perspective: 500px;
+}
+
+.cardMoves{
+	height: 440px;
+	width: 100%;
+	perspective: 500px;
+}
+.content{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	transition: transform 1s;
+	transform-style: preserve-3d;
+}
+
+ 
+.cardMoves .content{
+	transform: rotateY( 180deg ) ;
+	transition: transform 0.5s;
+}
+.sendContainer
+,.receiveContainer {
+	position: absolute;
+    height: 100%;
+	width: 100%;
+	background: white;
 	border-radius: 40px;
+	padding:10%;
 	display: flex;
    	align-items: center;
    	justify-content: center;
 	flex-direction: column;
-	box-shadow: rgba(0, 0, 0, 0.24) 0px 10px 20px, rgba(0, 0, 0, 0.28) 0px 6px 6px;
+	box-shadow: 0 0 15px rgba(0,0,0,0.1);
+	backface-visibility: hidden;
 }
+.receiveContainer {
+	background: white;
+	transform: rotateY( 180deg );
+}
+ 
+/* .uploadFilesContainer{
+	
+} */
 .dragFileArea {
 	border: 2px dashed #7b2cbf;
 	border-radius: 40px;
-	margin: 10px 0 15px;
-	padding: 30px 30px;
+	margin: 0;
+	padding: 0;
     height: 300px;
-	width:80%;
+	width:100%;
 	text-align: center;
 }
 .dragFileInput{
@@ -26,7 +62,13 @@
     background-color: black;
 }
  
- 
+.sendButtonContainer{
+	width: 100%;
+	margin-top: 16px;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+}
  
 /* .dragFileArea label .browseFilesText {
 	color: #7b2cbf;

@@ -2,13 +2,13 @@ import { contractAddresses, abi } from "../constants"
 // dont export from moralis when using react
 import { useMoralis, useWeb3Contract } from "react-moralis"
 import { useCallback, useEffect, useState } from "react"
-import { Input, useNotification } from "web3uikit"
+import { useNotification } from "web3uikit"
 import axios from "axios"
 import styles from "../styles/Send.module.css"
 import Lottie from "react-lottie"
 import uploadedAnimationData from "../assets/uploaded-animation.json"
 import uploadAnimationData from "../assets/upload-animation.json"
-import { Button, BeatLoader } from "@chakra-ui/react"
+import { Button, BeatLoader, ButtonGroup, Input } from "@chakra-ui/react"
 import { useDropzone } from "react-dropzone"
 
 export default function SendContract() {
@@ -55,6 +55,9 @@ export default function SendContract() {
     const [isUploading, setIsUploading] = useState(false)
     const [isGettingCode, setIsGettingCode] = useState(false)
     const [isGettingFile, setIsGettingFile] = useState(false)
+
+    const [isSendActive, setIsSendActive] = useState(true)
+    const [animate, setAnimate] = useState(false)
 
     const uploadAnimationdefaultOptions = {
         loop: true,
@@ -166,6 +169,7 @@ export default function SendContract() {
             }
         }
     }
+
     useEffect(() => {
         // console.log(ipfsFileHash)
         const send = async function () {
@@ -194,20 +198,31 @@ export default function SendContract() {
         ipfsFileHash && send()
     }, [ipfsFileHash])
 
+    const [action, setAction] = useState("send")
+
+    const changeActionType = (e) => {
+        e.preventDefault()
+        console.log("styles.card")
+    }
     return (
-        <div className="p-5">
+        <>
             {sendContractAddress ? (
-                <>
-                    <div className="m-4">
+                <div
+                    className={isSendActive ? styles.card : styles.cardMoves}
+                    // style={{ transform: "rotateY(180deg)", transition: "transform 0.5s" }}
+                    // onMouseEnter={() => changeActionType}
+                    // onMouseLeave={() => setIsShown(false)}
+                >
+                    <div className={styles.content}>
                         {/* {ipfsFileHash && (
                             <>
                                 <p>This image is stored on IPFS & The Ethereum Blockchain!</p>
                                 <img src={`https://ipfs.io/ipfs/${ipfsFileHash}`} alt="" />
                             </>
                         )} */}
-                        <h2>Upload</h2>
-                        <form encType="multipart/form-data">
-                            <div className={styles.uploadFilesContainer}>
+                        <div className={styles.sendContainer}>
+                            <form encType="multipart/form-data">
+                                {/* <div className={styles.uploadFilesContainer}> */}
                                 {fileImg ? (
                                     <div className={styles.dragFileArea}>
                                         <Lottie
@@ -240,58 +255,103 @@ export default function SendContract() {
                                             file from device
                                         </p>
                                         {/* <label className={styles.label}>
-                                            <span className={styles.browseFiles}>
-                                              
-                                            </span>{" "}
-                                        </label> */}
+                                                <span className={styles.browseFiles}>
+
+                                                </span>{" "}
+                                            </label> */}
                                     </div>
                                 )}
-
-                                {fileImg ? (
-                                    <Button
-                                        onClick={sendFileToIPFS}
-                                        type="submit"
-                                        colorScheme="purple"
-                                        isLoading={isGettingCode}
-                                    >
-                                        {generatedCode ? generatedCode : "Send"}
-                                    </Button>
+                                <div className={styles.sendButtonContainer}>
+                                    {fileImg ? (
+                                        <Button
+                                            onClick={sendFileToIPFS}
+                                            type="submit"
+                                            colorScheme="purple"
+                                            borderRadius="40px"
+                                            w="50%"
+                                            isLoading={isGettingCode}
+                                        >
+                                            {generatedCode ? generatedCode : "Send"}
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            onClick={sendFileToIPFS}
+                                            colorScheme="purple"
+                                            borderRadius="40px"
+                                            w="50%"
+                                            isLoading={isUploading}
+                                            isDisabled={fileImg ? false : true}
+                                        >
+                                            Upload
+                                        </Button>
+                                    )}
+                                </div>
+                            </form>
+                        </div>
+                        <div className={styles.receiveContainer}>
+                            <Input
+                                placeholder="Code"
+                                size="md"
+                                onChange={(e) => setCode(e.target.value)}
+                            />
+                            <Button
+                                colorScheme="purple"
+                                borderRadius="40px"
+                                w="50%"
+                                mt="16px"
+                                onClick={retrieve}
+                                disabled={isLoading}
+                            >
+                                {isLoading ? (
+                                    <div className="animate-spin spinner-border h-8 w-8 border-b-2 rounded-full"></div>
                                 ) : (
-                                    <Button
-                                        onClick={sendFileToIPFS}
-                                        colorScheme="purple"
-                                        isLoading={isUploading}
-                                        isDisabled={fileImg ? false : true}
-                                    >
-                                        Upload
-                                    </Button>
+                                    "Get File"
                                 )}
-                            </div>
-                        </form>
+                            </Button>
+                            {/* <div>{`The file hash is : ${fileHash}`}</div> */}
+                        </div>
                     </div>
-                    {/* <div className="m-4">
-                        <Input
-                            label="Label text"
-                            name="Test text Input"
-                            onChange={(e) => setCode(e.target.value)}
-                        />
-                        <button
-                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                            onClick={retrieve}
-                            disabled={isLoading}
-                        >
-                            {isLoading ? (
-                                <div className="animate-spin spinner-border h-8 w-8 border-b-2 rounded-full"></div>
-                            ) : (
-                                "Get File"
-                            )}
-                        </button>
-                        <div>{`The file hash is : ${fileHash}`}</div>
-                    </div> */}
-                </>
+                </div>
             ) : (
+                // <div className={styles.card}>
+                //     <div className={styles.content}>
+                //         <div className={styles.front}>Front</div>
+                //         <div className={styles.back}>Back!</div>
+                //     </div>
+                // </div>
                 <div>Please connect to a supported chain </div>
             )}
-        </div>
+            <div
+                style={{
+                    borderRadius: "40px",
+                    backgroundColor: "white",
+                    height: "60px",
+                    width: "100%",
+                    marginTop: "20px",
+                }}
+            >
+                <Button
+                    h="100%"
+                    w="50%"
+                    borderRadius="0"
+                    borderRightColor={"black"}
+                    borderRightWidth="2px"
+                    variant="unstyled"
+                    isDisabled={isSendActive}
+                    onClick={() => setIsSendActive(true)}
+                >
+                    Send
+                </Button>
+                <Button
+                    onClick={() => setIsSendActive(false)}
+                    h="100%"
+                    w="50%"
+                    variant="unstyled"
+                    isDisabled={!isSendActive}
+                >
+                    Receive
+                </Button>
+            </div>
+        </>
     )
 }
