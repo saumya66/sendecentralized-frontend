@@ -47,7 +47,7 @@ export default function SendContract() {
     const [fileBuffer, setFileBuffer] = useState()
 
     const [code, setCode] = useState()
-    const [fileHash, setFileHash] = useState()
+    const [retrievedFileHash, setRetrievedFileHash] = useState()
     const [isLoading, setIsLoading] = useState(false)
 
     const [fileImg, setFileImg] = useState(null)
@@ -89,14 +89,13 @@ export default function SendContract() {
         const transaction = await contract.getFile(code?.toString(), {
             gasLimit: 2500000,
         })
-        console.log("T : ", transaction)
         let transactionReceipt
         try {
             transactionReceipt = await transaction.wait(1)
         } catch (err) {
             console.log("F : ", err)
         }
-        setFileHash(transactionReceipt.events[0].args.fileHash)
+        setRetrievedFileHash(transactionReceipt.events[0].args.fileHash)
         setIsLoading(false)
     }
     // const {
@@ -173,27 +172,32 @@ export default function SendContract() {
     useEffect(() => {
         // console.log(ipfsFileHash)
         const send = async function () {
-            setIsGettingCode(true)
-            const address = sendContractAddress
-            console.log(address)
-            const ethers = Moralis.web3Library
-            const web3Provider = await Moralis.enableWeb3()
-            const signer = web3Provider.getSigner()
-            const contract = new ethers.Contract(address, abi, signer)
+            try {
+                setIsGettingCode(true)
+                const address = sendContractAddress
+                console.log(address)
+                const ethers = Moralis.web3Library
+                const web3Provider = await Moralis.enableWeb3()
+                const signer = web3Provider.getSigner()
+                const contract = new ethers.Contract(address, abi, signer)
 
-            contract.once("RequestFulfilled", async () => {
-                console.log("RequestFulfilled")
-                let code = await contract.getRandomNum()
-                setGeneratedCode(code)
-                handleNewNotification("Generated Code")
+                contract.once("RequestFulfilled", async () => {
+                    console.log("RequestFulfilled")
+                    let code = await contract.getRandomNum()
+                    setGeneratedCode(code)
+                    handleNewNotification("Generated Code")
+                    setIsGettingCode(false)
+                })
+
+                const transaction = await contract.uploadedFile(ipfsFileHash, {
+                    gasLimit: 2500000,
+                })
+                handleNewNotification("Transaction Complete, generating code... ")
+                await transaction.wait(1)
+            } catch (e) {
+                console.log("Error : " + e)
                 setIsGettingCode(false)
-            })
-
-            const transaction = await contract.uploadedFile(ipfsFileHash, {
-                gasLimit: 2500000,
-            })
-            handleNewNotification("Transaction Complete, generating code... ")
-            await transaction.wait(1)
+            }
         }
         ipfsFileHash && send()
     }, [ipfsFileHash])
@@ -219,6 +223,7 @@ export default function SendContract() {
                                 <p>This image is stored on IPFS & The Ethereum Blockchain!</p>
                                 <img src={`https://ipfs.io/ipfs/${ipfsFileHash}`} alt="" />
                             </>
+                            
                         )} */}
                         <div className={styles.sendContainer}>
                             <form encType="multipart/form-data">
@@ -289,25 +294,29 @@ export default function SendContract() {
                             </form>
                         </div>
                         <div className={styles.receiveContainer}>
-                            <Input
-                                placeholder="Code"
-                                size="md"
-                                onChange={(e) => setCode(e.target.value)}
-                            />
-                            <Button
-                                colorScheme="purple"
-                                borderRadius="40px"
-                                w="50%"
-                                mt="16px"
-                                onClick={retrieve}
-                                disabled={isLoading}
-                            >
-                                {isLoading ? (
-                                    <div className="animate-spin spinner-border h-8 w-8 border-b-2 rounded-full"></div>
+                            <div>
+                                <Input
+                                    // placeholder="Code"
+                                    size="md"
+                                    onChange={(e) => setCode(e.target.value)}
+                                />
+                                {retrievedFileHash ? (
+                                    <a href={`https://ipfs.io/ipfs/${ipfsFileHash}`} download>
+                                        File
+                                    </a>
                                 ) : (
-                                    "Get File"
+                                    <Button
+                                        colorScheme="purple"
+                                        borderRadius="40px"
+                                        w="50%"
+                                        mt="16px"
+                                        onClick={retrieve}
+                                        disabled={isLoading}
+                                    >
+                                        Get File
+                                    </Button>
                                 )}
-                            </Button>
+                            </div>
                             {/* <div>{`The file hash is : ${fileHash}`}</div> */}
                         </div>
                     </div>

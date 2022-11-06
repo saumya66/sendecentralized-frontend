@@ -18,8 +18,6 @@
 	transition: transform 1s;
 	transform-style: preserve-3d;
 }
-
- 
 .cardMoves .content{
 	transform: rotateY( 180deg ) ;
 	transition: transform 0.5s;
