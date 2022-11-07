@@ -83,7 +83,6 @@ export default function Home() {
             window.ethereum.removeListener("chainChanged", networkChanged)
         }
     }, [])
-    console.log(process.env.NEXT_PUBLIC_PINATA_API_KEY)
     return (
         <div className={styles.siteContainer}>
             <Head>
