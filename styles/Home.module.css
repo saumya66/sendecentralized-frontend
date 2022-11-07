@@ -9,12 +9,13 @@
  display : flex;
  flex-direction: row;
   width: 100%;
+  justify-content: space-between;
 }
 .description{
   width : 68%;
 }
 .app{
-  width : 30%;
+  width : 25%;
   height :90vh;
   display: flex;
   flex-direction: column;
