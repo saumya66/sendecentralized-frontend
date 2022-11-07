@@ -83,6 +83,7 @@ export default function Home() {
             window.ethereum.removeListener("chainChanged", networkChanged)
         }
     }, [])
+    console.log(process.env.NEXT_PUBLIC_PINATA_API_KEY)
     return (
         <div className={styles.siteContainer}>
             <Head>
@@ -115,8 +116,8 @@ export default function Home() {
                                 content={
                                     <>
                                         <div className={styles.h3}>
-                                            To use the app please change the chain to one of the
-                                            following 👇
+                                            To use the app please change the chain the chain to
+                                            Polygon Mumbai 👇
                                         </div>
                                         <Box
                                             display="flex"
@@ -131,13 +132,13 @@ export default function Home() {
                                             >
                                                 <div className={styles.h3}>Polygon Mumbai</div>
                                             </Button>
-                                            <Button
+                                            {/* <Button
                                                 variant="ghost"
                                                 w="45%"
                                                 onClick={() => changeNetwork("goerli")}
                                             >
                                                 <div className={styles.h3}>Goerli</div>
-                                            </Button>
+                                            </Button> */}
                                         </Box>
                                     </>
                                 }

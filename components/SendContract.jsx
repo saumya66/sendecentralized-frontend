@@ -40,7 +40,6 @@ export default function SendContract() {
     const [isGettingFile, setIsGettingFile] = useState(false)
 
     const [isSendActive, setIsSendActive] = useState(true)
-    const [animate, setAnimate] = useState(false)
 
     const { onCopy, value, setValue, hasCopied } = useClipboard("")
 
