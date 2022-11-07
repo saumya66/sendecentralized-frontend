@@ -6,4 +6,5 @@ const nextConfig = {
 module.exports = {
     nextConfig,
     images: { loader: "custom" },
+    future: { webpack5: true },
 }
