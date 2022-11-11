@@ -24,6 +24,6 @@
     "react-lottie": "^1.2.3",
     "react-moralis": "^1.4.0",
     "web3uikit": "^0.1.159"
-  },
+  }
 
 }
