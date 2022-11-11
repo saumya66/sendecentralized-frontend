@@ -146,7 +146,11 @@ export default function Home() {
                     )}
                 </div>
             ) : (
-                <div>Please connect to a Wallet</div>
+                <ModalComponent
+                    isOpen={isSwitchChainModalOpen}
+                    onClose={onClose}
+                    content={<div>Please connect to a Wallet</div>}
+                />
             )}
         </div>
     )

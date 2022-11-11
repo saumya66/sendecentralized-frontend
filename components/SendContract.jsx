@@ -132,7 +132,6 @@ export default function SendContract() {
     }
 
     useEffect(() => {
-        // console.log(ipfsFileHash)
         const send = async function () {
             try {
                 console.log("Getting Code...")
@@ -166,8 +165,6 @@ export default function SendContract() {
         console.log("Uploaded File")
         ipfsFileHash && send()
     }, [ipfsFileHash])
-
-    const [action, setAction] = useState("send")
 
     return (
         <>
