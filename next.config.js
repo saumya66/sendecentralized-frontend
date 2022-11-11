@@ -1,10 +1,7 @@
+import("next").NextConfig
+
 const nextConfig = {
     reactStrictMode: true,
-}
-
-module.exports = {
-    nextConfig,
-
     accordion: ["../src/**/*.accordion.@(j|t)sx"],
     addons: ["@chakra-ui/accordion"],
     framework: "@accordion/react",
@@ -17,7 +14,6 @@ module.exports = {
             include: /node_modules/,
             type: "javascript/auto",
         })
-
         return config
     },
     rules: [
@@ -33,3 +29,5 @@ module.exports = {
         },
     ],
 }
+
+module.exports = nextConfig
