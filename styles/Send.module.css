@@ -39,6 +39,7 @@
 }
 .receiveContainer {
 	background: white;
+	justify-content: flex-end;
 	transform: rotateY( 180deg );
 }
  

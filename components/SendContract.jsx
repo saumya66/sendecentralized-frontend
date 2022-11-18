@@ -81,16 +81,15 @@ export default function SendContract() {
             setIsLoading(false)
         } catch (err) {
             console.log("F : ", err)
-            handleNewNotification("File Downloaded Once Already!")
+            handleNewNotification("File Downloaded Once Already!", "error")
             setIsLoading(false)
         }
     }
 
-    const handleNewNotification = (message) => {
+    const handleNewNotification = (message, type) => {
         dispatch({
-            type: "info",
-            message: message,
-            title: "Transaction Complete!",
+            type: type,
+            title: message,
             position: "topR",
             icon: "bell",
         })
@@ -98,6 +97,7 @@ export default function SendContract() {
 
     const openFile = (e) => {
         e.preventDefault()
+        console.log("clicked")
         console.log(`https://ipfs.io/ipfs/${ipfsFileHash}`)
         window.open(`https://ipfs.io/ipfs/${ipfsFileHash}`, "_blank")
     }
@@ -148,14 +148,14 @@ export default function SendContract() {
                     let code = await contract.getRandomNum()
                     setGeneratedCode(code)
                     setValue(code)
-                    handleNewNotification("Generated Code")
+                    handleNewNotification("Generated Code", "success")
                     setIsGettingCode(false)
                 })
 
                 const transaction = await contract.uploadedFile(ipfsFileHash, {
                     gasLimit: 2500000,
                 })
-                handleNewNotification("Transaction Complete, generating code... ")
+                handleNewNotification("Transaction Complete, generating code... ", "info")
                 await transaction.wait(1)
             } catch (e) {
                 console.log("Error : " + e)
@@ -169,19 +169,8 @@ export default function SendContract() {
     return (
         <>
             {sendContractAddress ? (
-                <div
-                    className={isSendActive ? styles.card : styles.cardMoves}
-                    // style={{ transform: "rotateY(180deg)", transition: "transform 0.5s" }}
-                    // onMouseEnter={() => changeActionType}
-                    // onMouseLeave={() => setIsShown(false)}
-                >
+                <div className={isSendActive ? styles.card : styles.cardMoves}>
                     <div className={styles.content}>
-                        {/* {ipfsFileHash && (
-                            <>
-                                <p>This image is stored on IPFS & The Ethereum Blockchain!</p>
-                                <img src={`https://ipfs.io/ipfs/${ipfsFileHash}`} alt="" />
-                            </>
-                        )} */}
                         <div className={styles.sendContainer}>
                             {fileImg ? (
                                 <div className={styles.dragFileArea}>
@@ -251,31 +240,11 @@ export default function SendContract() {
                         </div>
                         <div className={styles.receiveContainer}>
                             <Input
-                                // placeholder="Code"
+                                placeholder="code"
+                                mb="12px"
                                 size="md"
                                 onChange={(e) => setCode(e.target.value)}
                             />
-                            {/* {retrievedFileHash ? (
-                                <Link
-                                    href={`https://ipfs.io/ipfs/${ipfsFileHash}`}
-                                    // rel="noreferrer"
-                                    // target="_blank"
-                                    style={{
-                                        height: "40px",
-                                        width: "50%",
-                                    }}
-                                >
-                                    <Box
-                                        bgColor="#6B46C1"
-                                        color="white"
-                                        borderRadius="40px"
-                                        h="100%"
-                                        w="100%"
-                                    >
-                                        open file
-                                    </Box>
-                                </Link>
-                            ) : ( */}
                             <Button
                                 colorScheme="purple"
                                 borderRadius="40px"
@@ -286,7 +255,6 @@ export default function SendContract() {
                             >
                                 {retrievedFileHash ? "open file" : "get file"}
                             </Button>
-                            {/* )} */}
                         </div>
                     </div>
                 </div>
