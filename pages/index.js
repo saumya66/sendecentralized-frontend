@@ -4,7 +4,7 @@ import { useMoralis } from "react-moralis"
 import { ConnectButton } from "web3uikit"
 import ModalComponent from "../components/ModalComponent"
 import { useEffect, useState } from "react"
-import { Box, Button } from "@chakra-ui/react"
+import { Box, Button, Center, Text } from "@chakra-ui/react"
 import SendContract from "../components/SendContract"
 
 const supportedChains = ["31337", "80001", "5"]
@@ -92,9 +92,7 @@ export default function Home() {
             </Head>
             <nav className={styles.header}>
                 <h1 className={styles.h1}>sendecentralized</h1>
-                <div className="ml-auto py-2 px-4">
-                    <ConnectButton moralisAuth={false} />
-                </div>
+                <ConnectButton moralisAuth={false} />
             </nav>
 
             {isWeb3Enabled ? (
@@ -111,24 +109,20 @@ export default function Home() {
                             <ModalComponent
                                 isOpen={isSwitchChainModalOpen}
                                 onClose={onClose}
+                                title={"Add/Switch Chain"}
                                 content={
                                     <>
-                                        <div className={styles.h3}>
-                                            To use the app please change the chain the chain to
-                                            Polygon Mumbai 👇
-                                        </div>
-                                        <Box
-                                            display="flex"
-                                            align="center"
-                                            justifyContent="space-between"
-                                            direction="row"
-                                        >
+                                        <Text mb="12px" className={styles.h3}>
+                                            To use the app please add/switch the chain to Polygon
+                                            Mumbai 👇
+                                        </Text>
+                                        <Center>
                                             <Button
-                                                variant="ghost"
                                                 w="45%"
+                                                colorShcheme="purple"
                                                 onClick={() => changeNetwork("polygon_mumbai")}
                                             >
-                                                <div className={styles.h3}>Polygon Mumbai</div>
+                                                <p className={styles.h3}>Polygon Mumbai</p>
                                             </Button>
                                             {/* <Button
                                                 variant="ghost"
@@ -137,7 +131,7 @@ export default function Home() {
                                             >
                                                 <div className={styles.h3}>Goerli</div>
                                             </Button> */}
-                                        </Box>
+                                        </Center>
                                     </>
                                 }
                             />
@@ -148,7 +142,15 @@ export default function Home() {
                 <ModalComponent
                     isOpen={isSwitchChainModalOpen}
                     onClose={onClose}
-                    content={<div>Please connect to a Wallet</div>}
+                    title={"Connect Wallet"}
+                    content={
+                        <div>
+                            <Text mb="12px">Please connect to a wallet to use the app 👇</Text>
+                            <Center>
+                                <ConnectButton moralisAuth={false} />
+                            </Center>
+                        </div>
+                    }
                 />
             )}
         </div>
