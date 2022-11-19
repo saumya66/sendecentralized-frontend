@@ -91,7 +91,7 @@ export default function SendContract() {
             setIsLoading(false)
         } catch (err) {
             console.log("F : ", err)
-            handleNewNotification("file downloaded once already!", "error")
+            handleNewNotification("file requested once already!", "error")
             setIsLoading(false)
         }
     }
