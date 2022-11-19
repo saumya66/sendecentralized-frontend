@@ -8,7 +8,16 @@ import styles from "../styles/Send.module.css"
 import Lottie from "react-lottie"
 import uploadedAnimationData from "../assets/uploaded-animation.json"
 import uploadAnimationData from "../assets/upload-animation.json"
-import { Link, Button, BeatLoader, ButtonGroup, Input, Box, useClipboard } from "@chakra-ui/react"
+import {
+    Link,
+    Button,
+    BeatLoader,
+    ButtonGroup,
+    Input,
+    Box,
+    useClipboard,
+    useToast,
+} from "@chakra-ui/react"
 import { useDropzone } from "react-dropzone"
 
 export default function SendContract() {
@@ -18,7 +27,7 @@ export default function SendContract() {
     // console.log(`ChainId is ${chainId}`)
     const sendContractAddress = chainId in contractAddresses ? contractAddresses[chainId] : null
     const dispatch = useNotification()
-
+    const toast = useToast()
     const onDrop = useCallback((acceptedFiles) => {
         console.log(acceptedFiles)
         setFileImg(acceptedFiles[0])
@@ -78,20 +87,28 @@ export default function SendContract() {
             transactionReceipt = await transaction.wait(1)
             setRetrievedFileHash(transactionReceipt.events[0].args.fileHash)
             console.log(transactionReceipt.events[0].args.fileHash)
+            handleNewNotification("got the file", "success")
             setIsLoading(false)
         } catch (err) {
             console.log("F : ", err)
-            handleNewNotification("File Downloaded Once Already!", "error")
+            handleNewNotification("file downloaded once already!", "error")
             setIsLoading(false)
         }
     }
 
     const handleNewNotification = (message, type) => {
-        dispatch({
-            type: type,
+        // dispatch({
+        //     type: type,
+        //     title: message,
+        //     position: "topR",
+        //     icon: "bell",
+        // })
+        toast({
             title: message,
-            position: "topR",
-            icon: "bell",
+            // description: "We've created your account for you.",
+            status: type,
+            duration: 9000,
+            isClosable: true,
         })
     }
 
@@ -155,7 +172,7 @@ export default function SendContract() {
                 const transaction = await contract.uploadedFile(ipfsFileHash, {
                     gasLimit: 2500000,
                 })
-                handleNewNotification("Transaction Complete, generating code... ", "info")
+                handleNewNotification("Generating code... ", "info")
                 await transaction.wait(1)
             } catch (e) {
                 console.log("Error : " + e)
